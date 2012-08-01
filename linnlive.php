@@ -11,23 +11,33 @@
 // http://www.gnu.org/licenses/gpl.html
 // ***************************************************************/
 
-public class LinnLive 
+require_once(dirname(__FILE__).'/libraries/linnlive/inventory.php');
+require_once(dirname(__FILE__).'/libraries/linnlive/order.php');
+
+class LinnLive 
 {
 	protected $settings = array();
 		
 	protected function default_settings()
 	{
 		return array(
-			'api_key' = ''
+			'api_key' => ''
 		);
 	}
-
-	public function __construct($settings = false)
+	
+	protected function call_service($service, $method, $request)
 	{
-		parent::_construct();
-		if (is_array($settings))
+		$client = new $service();
+		$request->Token = $this->settings['api_key'];
+		return $client->$method($request);
+	}
+	
+	public function __construct()
+	{
+		// initialize default settings
+		foreach ($this->default_settings() as $key => $default)
 		{
-			$this->initialize($settings);
+			$this->settings[$key] = $default;
 		}
 	}
 		
@@ -41,5 +51,13 @@ public class LinnLive
                 $this->settings[$key] = is_bool($default) ? (bool)$settings[$key] : $settings[$key];
             }
 	    }
+    }
+    
+    public function get_stock($params = array())
+    {
+    	$request = new GetStockItem();
+		$request->filter = new StockItemFilter();
+	    return $this->call_service('InventoryClient', 'GetStockItem', $request);
+	    
     }
 }

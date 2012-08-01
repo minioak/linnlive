@@ -21,12 +21,6 @@ class ProcessOrderResponse {
   public $ProcessOrderResult; // GenericResponse
 }
 
-class GenericResponse {
-  public $Error; // string
-  public $ErrorNum; // int
-  public $IsError; // boolean
-}
-
 class GetLiteOpenOrders {
   public $Token; // string
   public $page; // int
@@ -96,7 +90,7 @@ class GetFilteredOrdersResponse {
   public $GetFilteredOrdersResult; // GetFilteredOrdersResponse
 }
 
-class GetFilteredOrdersResponse {
+class GetFilteredOrdersResult {
   public $MorePages; // boolean
   public $Orders; // ArrayOfOrder
 }
@@ -225,9 +219,6 @@ class AddOrderAuditResponse {
   public $AddOrderAuditResult; // GenericResponse
 }
 
-class guid {
-}
-
 /* ***************************************************************
 // LinnLive - Order Management 
 // Copyright (c) 2012 John Mitchell - http://www.minioak.com
@@ -240,7 +231,7 @@ class guid {
 // http://www.gnu.org/licenses/gpl.html
 // ***************************************************************/
 
-class Order extends SoapClient {
+class OrderClient extends SoapClient {
 
   private static $classmap = array(
                                     'ProcessOrder' => 'ProcessOrder',

@@ -6,19 +6,21 @@ class GetStockItem {
 
 class StockItemFilter {
   public $pkStockItemId; // guid
-  public $IsSetpkStockItemId; // boolean
+  public $IsSetpkStockItemId = false; // boolean
   public $EntriesPerPage; // int
   public $PageNumber; // int
   public $SKU; // string
-  public $IsSetSKU; // boolean
+  public $IsSetSKU = false; // boolean
   public $BarcodeNumber; // string
-  public $IsSetBarcodeNumber; // boolean
+  public $IsSetBarcodeNumber = false; // boolean
   public $ItemTitle; // string
-  public $IsSetItemTitle; // boolean
-}
-
-class GetStockItemResponse {
-  public $GetStockItemResult; // GetStockItemResponse
+  public $IsSetItemTitle = false; // boolean
+  
+  public function __construct() 
+  {
+	  $this->pkStockItemId = new guid();
+	  
+  }
 }
 
 class GetStockItemResponse {
@@ -402,6 +404,25 @@ class AddStockCountResponse {
 }
 
 class guid {
+
+  protected $value;
+  
+  public function __construct($value = false)
+  {
+	  $this->value = $value;
+  }
+  
+  public function __toString()
+  {
+  	$s = strtoupper(md5(uniqid(rand(),true))); 
+	$guidText = 
+	    substr($s,0,8) . '-' . 
+	    substr($s,8,4) . '-' . 
+	    substr($s,12,4). '-' . 
+	    substr($s,16,4). '-' . 
+	    substr($s,20); 
+	return $this->value ? $this->value : $guidText;
+  }
 }
 
 
@@ -417,12 +438,11 @@ class guid {
 // http://www.gnu.org/licenses/gpl.html
 // ***************************************************************/
 
-class Inventory extends SoapClient {
+class InventoryClient extends SoapClient {
 
   private static $classmap = array(
                                     'GetStockItem' => 'GetStockItem',
                                     'StockItemFilter' => 'StockItemFilter',
-                                    'GetStockItemResponse' => 'GetStockItemResponse',
                                     'GetStockItemResponse' => 'GetStockItemResponse',
                                     'GenericResponse' => 'GenericResponse',
                                     'StockItem' => 'StockItem',
@@ -480,16 +500,11 @@ class Inventory extends SoapClient {
                                     'StockLevelAddDeductResponse' => 'StockLevelAddDeductResponse',
                                     'StockCountItemResponse' => 'StockCountItemResponse',
                                     'AddStockCount' => 'AddStockCount',
-                                    'AddStockCountResponse' => 'AddStockCountResponse',
-                                    'guid' => 'guid',
+                                    'AddStockCountResponse' => 'AddStockCountResponse'
                                    );
 
-  public function Inventory($wsdl = "http://api.linnlive.com/Inventory.asmx?wsdl", $options = array()) {
-    foreach(self::$classmap as $key => $value) {
-      if(!isset($options['classmap'][$key])) {
-        $options['classmap'][$key] = $value;
-      }
-    }
+  public function __construct($wsdl = "http://api.linnlive.com/Inventory.asmx?wsdl", $options = array()) {
+    $options['classmap'] = self::$classmap;
     parent::__construct($wsdl, $options);
   }
 
