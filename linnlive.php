@@ -17,11 +17,14 @@ require_once(dirname(__FILE__).'/libraries/linnlive/order.php');
 class LinnLive 
 {
 	protected $settings = array();
+	protected $order_status = array('unpaid', 'paid', 'return', 'pending', 'resend');
 		
 	protected function default_settings()
 	{
 		return array(
-			'api_key' => ''
+			'api_key' => '',
+			'tax_rate' => 20,
+			'currency_code' => 'GBP'
 		);
 	}
 	
@@ -71,15 +74,75 @@ class LinnLive
 	    } 
 	    catch (Exception $e) 
 	    {
-		    return new LinnLive_response(LinnLive_response::FAILED, $e->getMessage());
+		    return new LinnLive_response($e->getMessage(), LinnLive_response::FAILED);
 	    }
 	    
-	    return new LinnLive_response(LinnLive_response::SUCCESS, $response->GetStockItemResult->StockItems->StockItem);
+	    return new LinnLive_response($response->GetStockItemResult->StockItems->StockItem);
     }
     
     public function add_order($params = array())
     {
-    	$this->require_params(array(), $params);
+    	$this->require_params(array(
+    		'reference', 
+    		'postage_excl_tax', 
+    		'postage',
+    		'subtotal',
+    		'total_discount',
+    		'total',
+    		'order_processed',
+    		'payment_method',
+    		'items'), $params);
+    		
+    	$order = new Order();
+    	if (isset($params['name'])) $order->FullName = $params['name'];
+    	if (isset($params['email'])) $order->Email = $params['email'];
+    	if (isset($params['phone'])) $order->BuyerPhoneNumber = $params['phone'];
+    	$order->OrderDate = now();
+    	$order->OrderDateProcessedDate = $order->OrderDate;
+    	$order->PostageCostExTax = $params['postage_excl_tax'];
+    	$order->PostageCost = $params['postage'];
+    	$order->Subtotal = $params['subtotal'];
+    	$order->TotalCost = $params['total'];
+    	$order->TotalDiscount = $params['total_discount'];
+    	$order->CountryOrStateTaxRate = $this->settings['tax_rate'];
+    	$order->BankName = $params['payment_method'];
+    	$order->CurrencyCode = $this->settings['currency_code'];
+    	$order->OrderId = $params['reference'];
+    	$order->Status = isset($params['status']) ? array_search($params['status'], $this->order_status) : 1;
+    	$order->OrderProcessed = $params['order_processed'];
+    	$order->OrderHoldOrCancel = false;
+    	$order->OrderMarker = 0;
+    	
+    	foreach ($params['items'] as $item)
+    	{
+	    	$order_item = new OrderItem();
+	    	
+	    	$order->OrderItems[] = $order_item;
+    	}
+    	
+    	if (isset($params['notes']))
+    	{
+	    	foreach ($params['notes'] as $notes)
+	    	{
+		    	$order_note = new OrderNote();
+		    	
+		    	$order->OrderNotes[] = $order_note;
+	    	}
+    	}
+    	
+    	$request = new AddNewOrder();
+    	$request->order = $order;
+    	
+    	try 
+	    {
+	    	$response = $this->call_service('OrderClient', 'AddNewOrder', $request);
+	    } 
+	    catch (Exception $e) 
+	    {
+		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
+	    }
+    		
+    	return LinnLive_response($response);
     }
 }
 
@@ -88,38 +151,45 @@ class LinnLive_response
 	const SUCCESS = 'successful';
 	const FAILED = 'failed';
 	
-	protected $_message;
-	protected $_status;
-	protected $_data;
+	protected $_message = false;
+	protected $_status = false;
+	protected $_response = false;
 	
-	public function __construct($status, $data = false, $message = false)
+	public function __construct($response, $message = false, $status = false)
 	{
-		if ($data)
-		{
-			$this->_status = LinnLive_response::SUCCESS;
-			$this->_message = $message;
-			$this->_data = objectToArray($data);
-		}
-		else
-		{
-			$this->_status = LinnLive_response::FAILED;
-			$this->_message = $message;
-		}
+		if ($status) $this->_status = $status;
+		if ($message) $this->_message = $message;
+		
+		$this->_response = $response;
 	}
 	
 	public function message()
 	{
-		return $_message;
+		if ($this->_message) return $this->_message;
+		
+		if (is_object($this->_response) && get_class($this->_response) === 'GenericResponse')
+		{
+			return $this->_response->Error;
+		}
+
+		return '';
 	}
 	
 	public function status()
 	{
-		return $_status;
+		if ($this->_status) return $this->_status;
+		
+		if (is_object($this->_response) && get_class($this->_response) === 'GenericResponse')
+		{
+			return ($this->_response->ErrorNum === 0) ? self::SUCCESS : self::FAILED;
+		}
+		
+		return ($this->_response) ? self::SUCCESS : self::FAILED;
 	}
 	
-	public function data()
+	public function response()
 	{
-		return $_data;
+		return objectToArray($_response);
 	}
 }
 

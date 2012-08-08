@@ -128,6 +128,12 @@ class Order {
   public $OrderItems; // ArrayOfOrderItem
   public $OrderNotes; // ArrayOfOrderNotes
   public $Audit; // ArrayOfOrderAudit
+  
+  public function __construct() 
+  {
+	  $this->pkOrderId = new guid();
+	  
+  }
 }
 
 class Address {
@@ -265,11 +271,7 @@ class OrderClient extends SoapClient {
                                    );
 
   public function Order($wsdl = "http://api.linnlive.com/order.asmx?wsdl", $options = array()) {
-    foreach(self::$classmap as $key => $value) {
-      if(!isset($options['classmap'][$key])) {
-        $options['classmap'][$key] = $value;
-      }
-    }
+    $options['classmap'] = self::$classmap;
     parent::__construct($wsdl, $options);
   }
 
