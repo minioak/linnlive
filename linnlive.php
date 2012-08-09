@@ -89,7 +89,6 @@ class LinnLive
     		'subtotal',
     		'total_discount',
     		'total',
-    		'order_processed',
     		'payment_method',
     		'items'), $params);
     		
@@ -97,6 +96,7 @@ class LinnLive
     	if (isset($params['name'])) $order->FullName = $params['name'];
     	if (isset($params['email'])) $order->Email = $params['email'];
     	if (isset($params['phone'])) $order->BuyerPhoneNumber = $params['phone'];
+    	$order->OrderId = 0;
     	$order->OrderDate = date('c');
     	$order->OrderProcessedDate = $order->OrderDate;
     	$order->PostageCostExTax = $params['postage_excl_tax'];
@@ -107,17 +107,19 @@ class LinnLive
     	$order->CountryOrStateTaxRate = $this->settings['tax_rate'];
     	$order->BankName = $params['payment_method'];
     	$order->CurrencyCode = $this->settings['currency_code'];
-    	$order->OrderId = $params['reference'];
+    	$order->ReferenceNumber = $params['reference'];
     	$order->Status = isset($params['status']) ? array_search($params['status'], $this->order_status) : 1;
-    	$order->OrderProcessed = $params['order_processed'];
+    	$order->OrderProcessed = true;
     	$order->OrderHoldOrCancel = false;
     	$order->OrderMarker = 0;
+    	$order->PostalServiceName = '';
+    	$order->PackagingGroup = '';
     	
     	foreach ($params['items'] as $item)
     	{
 	    	$order_item = new OrderItem();
 	    	
-	    	$this->require_params(array('sku', 'quantity', 'unit_cost', 'tax_included', 'discount', 'tax', 'cost', 'cost_including_tax'), $item);
+	    	$this->require_params(array('title', 'sku', 'quantity', 'unit_cost', 'tax_included', 'discount', 'tax', 'cost', 'cost_including_tax'), $item);
 	    	
 	    	$order_item->SKU = $item['sku'];
 	    	$order_item->Qty = $item['quantity'];
