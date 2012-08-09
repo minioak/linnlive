@@ -97,8 +97,8 @@ class LinnLive
     	if (isset($params['name'])) $order->FullName = $params['name'];
     	if (isset($params['email'])) $order->Email = $params['email'];
     	if (isset($params['phone'])) $order->BuyerPhoneNumber = $params['phone'];
-    	$order->OrderDate = now();
-    	$order->OrderDateProcessedDate = $order->OrderDate;
+    	$order->OrderDate = date('c');
+    	$order->OrderProcessedDate = $order->OrderDate;
     	$order->PostageCostExTax = $params['postage_excl_tax'];
     	$order->PostageCost = $params['postage'];
     	$order->Subtotal = $params['subtotal'];
@@ -117,22 +117,45 @@ class LinnLive
     	{
 	    	$order_item = new OrderItem();
 	    	
+	    	$this->require_params(array('sku', 'quantity', 'unit_cost', 'tax_included', 'discount', 'tax', 'cost', 'cost_including_tax'), $item);
+	    	
+	    	$order_item->SKU = $item['sku'];
+	    	$order_item->Qty = $item['quantity'];
+	    	if (isset($item['title'])) $order_item->ItemTitle = $item['title'];
+	    	$order_item->IsCompositeChild = false;
+	    	$order_item->UnitCost = $item['unit_cost'];
+	    	$order_item->TaxRate = isset($item['tax_rate']) ? $item['tax_rate'] : $this->settings['tax_rate'];
+	    	$order_item->TaxCostInclusive = $item['tax_included'];
+	    	$order_item->ParentRowId = new guid();
+	    	$order_item->CostIncTax = $item['cost_including_tax'];
+	    	$order_item->Cost = $item['cost'];
+	    	$order_item->LineDiscount = $item['discount'];
+	    	$order_item->IsService = false;
+	    	$order_item->SalesTax = $item['tax'];
+	    	
 	    	$order->OrderItems[] = $order_item;
     	}
     	
     	if (isset($params['notes']))
     	{
-	    	foreach ($params['notes'] as $notes)
+	    	foreach ($params['notes'] as $note)
 	    	{
-		    	$order_note = new OrderNote();
+		    	$order_note = new OrderNotes();
 		    	
+		    	$this->require_params(array('message', 'username', 'internal'), $note);
+		    	
+		    	$order_note->Note = $note['message'];
+		    	$order_note->Internal = $note['internal'];
+		    	$order_note->NoteUserName = $note['username'];
+		    	$order_note->NoteEntryDate = date('c');
+						    	
 		    	$order->OrderNotes[] = $order_note;
 	    	}
     	}
     	
     	$request = new AddNewOrder();
     	$request->order = $order;
-    	
+    	    	
     	try 
 	    {
 	    	$response = $this->call_service('OrderClient', 'AddNewOrder', $request);
@@ -142,7 +165,7 @@ class LinnLive
 		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
 	    }
     		
-    	return LinnLive_response($response);
+    	return new LinnLive_response($response);
     }
 }
 
@@ -187,9 +210,9 @@ class LinnLive_response
 		return ($this->_response) ? self::SUCCESS : self::FAILED;
 	}
 	
-	public function response()
+	public function data()
 	{
-		return objectToArray($_response);
+		return objectToArray($this->_response);
 	}
 }
 

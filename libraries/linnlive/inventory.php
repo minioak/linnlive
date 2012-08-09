@@ -19,7 +19,6 @@ class StockItemFilter {
   public function __construct() 
   {
 	  $this->pkStockItemId = new guid();
-	  
   }
 }
 

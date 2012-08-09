@@ -166,6 +166,11 @@ class OrderItem {
   public $LineDiscount; // double
   public $IsService; // boolean
   public $SalesTax; // double
+    
+  public function __construct() 
+  {
+	  $this->RowId = new guid();
+  }
 }
 
 class OrderNotes {
@@ -174,6 +179,11 @@ class OrderNotes {
   public $Internal; // boolean
   public $NoteUserName; // string
   public $NoteEntryDate; // dateTime
+  
+  public function __construct() 
+  {
+	  $this->pkOrderNoteId = new guid();
+  }
 }
 
 class OrderAudit {
@@ -266,11 +276,10 @@ class OrderClient extends SoapClient {
                                     'DeleteOrder' => 'DeleteOrder',
                                     'DeleteOrderResponse' => 'DeleteOrderResponse',
                                     'AddOrderAudit' => 'AddOrderAudit',
-                                    'AddOrderAuditResponse' => 'AddOrderAuditResponse',
-                                    'guid' => 'guid',
+                                    'AddOrderAuditResponse' => 'AddOrderAuditResponse'
                                    );
 
-  public function Order($wsdl = "http://api.linnlive.com/order.asmx?wsdl", $options = array()) {
+  public function OrderClient($wsdl = "http://api.linnlive.com/order.asmx?wsdl", $options = array()) {
     $options['classmap'] = self::$classmap;
     parent::__construct($wsdl, $options);
   }
