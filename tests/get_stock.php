@@ -6,4 +6,4 @@ $linn = new LinnLive();
 $linn->initialize(array('api_key' => ''));
 $stock = $linn->get_stock();
 
-var_dump($stock);
+var_dump($stock->data());

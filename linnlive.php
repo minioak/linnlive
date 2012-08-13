@@ -167,7 +167,34 @@ class LinnLive
 		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
 	    }
     		
+    	return new LinnLive_response($response->AddNewOrderResult);
+    }
+    
+    public function process_order($params = array())
+    {
+	    $this->require_params(array('order_id', 'username'), $params);
+	    
+	    $request = new ProcessOrder();
+	    
+	    $order = new ProcessOrderRequest();
+	    $order->OrderIdIsSet = true;
+	    $order->OrderId = $params['order_id'];
+    	$order->ProcessDateTime = date('c');
+    	$order->ProcessedByName = $params['username'];
+    	
+    	$request->request = $order;
+    	
+    	try 
+	    {
+	    	$response = $this->call_service('OrderClient', 'ProcessOrder', $request);
+	    } 
+	    catch (Exception $e) 
+	    {
+		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
+	    }
+    		
     	return new LinnLive_response($response);
+	    
     }
 }
 
@@ -192,7 +219,7 @@ class LinnLive_response
 	{
 		if ($this->_message) return $this->_message;
 		
-		if (is_object($this->_response) && get_class($this->_response) === 'GenericResponse')
+		if (is_object($this->_response) && property_exists(get_class($this->_response), 'Error'))
 		{
 			return $this->_response->Error;
 		}
@@ -204,7 +231,7 @@ class LinnLive_response
 	{
 		if ($this->_status) return $this->_status;
 		
-		if (is_object($this->_response) && get_class($this->_response) === 'GenericResponse')
+		if (is_object($this->_response) && property_exists(get_class($this->_response), 'ErrorNum'))
 		{
 			return ($this->_response->ErrorNum === 0) ? self::SUCCESS : self::FAILED;
 		}
