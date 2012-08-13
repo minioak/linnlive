@@ -15,6 +15,12 @@ class ProcessOrderRequest {
   public $ProcessedByName; // string
   public $ProcessDateTimeIdIsSet; // boolean
   public $ProcessDateTime; // dateTime
+  
+  
+  public function __construct() 
+  {
+	  $this->pkOrderId = new guid();
+  }
 }
 
 class ProcessOrderResponse {
@@ -200,7 +206,14 @@ class AddNewOrder {
 }
 
 class AddNewOrderResponse {
-  public $AddNewOrderResult; // GenericResponse
+  public $AddNewOrderResult; // AddOrderResponse
+}
+
+class AddOrderResponse {
+  public $MorePages; // boolean
+  public $OrderId; // int
+  public $pkOrderId; // guid
+  public $Orders; // ArrayOfOrderLite
 }
 
 class UpdateOrder {
@@ -269,7 +282,7 @@ class OrderClient extends SoapClient {
                                     'OrderNotes' => 'OrderNotes',
                                     'OrderAudit' => 'OrderAudit',
                                     'AddNewOrder' => 'AddNewOrder',
-                                    'AddNewOrderResponse' => 'AddNewOrderResponse',
+                                    'AddOrderResponse' => 'AddOrderResponse',
                                     'UpdateOrder' => 'UpdateOrder',
                                     'UpdateOrderResponse' => 'UpdateOrderResponse',
                                     'GetOrderResponse' => 'GetOrderResponse',

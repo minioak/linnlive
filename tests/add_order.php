@@ -28,4 +28,11 @@ $order = $linn->add_order(array(
 	)
 ));
 
-var_dump($order);
+$order_data = $order->data();
+
+$processed_order = $linn->process_order(array(
+	'order_id' => $order_data['OrderId'],
+	'username' => 'John M'
+));
+
+var_dump($processed_order);
