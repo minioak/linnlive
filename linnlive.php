@@ -196,6 +196,33 @@ class LinnLive
     	return new LinnLive_response($response);
 	    
     }
+    
+    public function update_stock_level($params = array())
+    {
+    	$this->require_params(array('stock_id', 'location', 'level'), $params);
+    	
+	    $request = new StockLevel();
+	    $request->pkStockItemId = $params['stock_id'];
+	    $request->UpdateSource = 'API';
+	    
+	    $level = new StockItemLevel();
+	    $level->Location = $params['location'];
+	    $level->Level = $params['level'];
+	    $level->IsSetLevel = true;
+	    
+	    $request->stocklevel = $level;
+	    
+	    try 
+	    {
+	    	$response = $this->call_service('InventoryClient', 'ChangeStockLevel', $request);
+	    } 
+	    catch (Exception $e) 
+	    {
+		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
+	    }
+    		
+    	return new LinnLive_response($response);
+    }
 }
 
 class LinnLive_response
