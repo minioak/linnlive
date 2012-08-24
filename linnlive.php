@@ -201,7 +201,7 @@ class LinnLive
     {
     	$this->require_params(array('stock_id', 'location', 'level'), $params);
     	
-	    $request = new StockLevel();
+	    $request = new ChangeStockLevel();
 	    $request->pkStockItemId = $params['stock_id'];
 	    $request->UpdateSource = 'API';
 	    
