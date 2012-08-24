@@ -202,7 +202,7 @@ class LinnLive
     	$this->require_params(array('stock_id', 'location', 'level'), $params);
     	
 	    $request = new ChangeStockLevel();
-	    $request->pkStockItemId = $params['stock_id'];
+	    $request->pkStockItemId = new guid($params['stock_id']);
 	    $request->UpdateSource = 'API';
 	    
 	    $level = new StockItemLevel();
@@ -221,7 +221,7 @@ class LinnLive
 		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
 	    }
     		
-    	return new LinnLive_response($response);
+    	return new LinnLive_response($response->ChangeStockLevelResult);
     }
 }
 

@@ -118,14 +118,14 @@ class StockItemExtendedProperty {
 
 class StockItemLevel {
   public $Location; // string
-  public $Level; // int
-  public $IsSetLevel; // boolean
-  public $MinimumLevel; // int
-  public $IsSetMinimumLevel; // boolean
-  public $StockValue; // double
-  public $IsSetStockValue; // boolean
-  public $InOrderBook; // int
-  public $OnOrder; // int
+  public $Level = 0; // int
+  public $IsSetLevel = false; // boolean
+  public $MinimumLevel = 9; // int
+  public $IsSetMinimumLevel = false; // boolean
+  public $StockValue = 0; // double
+  public $IsSetStockValue = false; // boolean
+  public $InOrderBook = 0; // int
+  public $OnOrder = 0; // int
 }
 
 class StockItemListingPrice {
