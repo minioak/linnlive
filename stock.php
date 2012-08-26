@@ -14,33 +14,47 @@ require_once(dirname(__FILE__).'/linnlive.php');
 
 class LinnLive_stock extends LinnLive_request
 {
+
+	
+	/**
+	 * get function.
+	 * 
+	 * @access public
+	 * @param array $params (default: array())
+	 * @return void
+	 */
 	public function get($params = array())
     {
     	$request = new GetStockItem();
 		$request->filter = new StockItemFilter();
 		
-		if (isset($params['stock_id']))
+		if (isset($params['filter']))
 		{
-			$request->filter->pkStockItemId = $params['stock_id'];
-			$request->filter->IsSetpkStockItemId = true;
-		}
-		
-		if (isset($params['sku']))
-		{
-			$request->filter->SKU = $params['sku'];
-			$request->filter->IsSetSKU = true;
-		}
-		
-		if (isset($params['barcode']))
-		{
-			$request->filter->BarcodeNumber = $params['barcode'];
-			$request->filter->IsSetBarcodeNumber = true;
-		}
-		
-		if (isset($params['title']))
-		{
-			$request->filter->ItemTitle = $params['title'];
-			$request->filter->IsSetItemTitle = true;
+			$filter = $params['filter'];
+			
+			if (isset($filter['stock_id']))
+			{
+				$request->filter->pkStockItemId = $filter['stock_id'];
+				$request->filter->IsSetpkStockItemId = true;
+			}
+			
+			if (isset($filter['sku']))
+			{
+				$request->filter->SKU = $filter['sku'];
+				$request->filter->IsSetSKU = true;
+			}
+			
+			if (isset($filter['barcode']))
+			{
+				$request->filter->BarcodeNumber = $filter['barcode'];
+				$request->filter->IsSetBarcodeNumber = true;
+			}
+			
+			if (isset($filter['title']))
+			{
+				$request->filter->ItemTitle = $filter['title'];
+				$request->filter->IsSetItemTitle = true;
+			}
 		}
 		
 	    try 

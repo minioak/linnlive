@@ -7,10 +7,12 @@ Stock
 ---------
 ### get($params = array())
 #### Parameters
-	sku - Search by SKU
-	barcode - Search by barcode
-	stock_id - Search by internal LinnLive id
-	title - Search by product title
+	filter = array(
+		sku => Search by SKU
+		barcode => Search by barcode
+		stock_id => Search by internal LinnLive id
+		title => Search by product title
+	);
 
 
 Orders
