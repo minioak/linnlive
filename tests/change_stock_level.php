@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../stock.php');
 
-$linn = new LinnLive_Stock();
+$linn = new LinnLive_stock();
 $linn->initialize(array('api_key' => ''));
 
 $update = $linn->update_stock_level(array(

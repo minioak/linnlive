@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../orders.php');
 
-$linn = new LinnLive_Orders();
+$linn = new LinnLive_orders();
 $linn->initialize(array('api_key' => ''));
 
 $order = $linn->create(array(
