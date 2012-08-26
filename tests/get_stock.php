@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/../linnlive.php');
 
-$linn = new LinnLive();
+$linn = new Stock();
 $linn->initialize(array('api_key' => ''));
 $stock = $linn->get_stock();
 

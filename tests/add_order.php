@@ -1,11 +1,11 @@
 <?php
 
-require_once(dirname(__FILE__).'/../linnlive.php');
+require_once(dirname(__FILE__).'/../orders.php');
 
-$linn = new LinnLive();
+$linn = new Orders();
 $linn->initialize(array('api_key' => ''));
 
-$order = $linn->add_order(array(
+$order = $linn->create(array(
 	'reference' => 'SCO123', 
 	'postage_excl_tax' => 1.0, 
 	'postage' => 1.2,
@@ -30,7 +30,7 @@ $order = $linn->add_order(array(
 
 $order_data = $order->data();
 
-$processed_order = $linn->process_order(array(
+$processed_order = $linn->process(array(
 	'order_id' => $order_data['OrderId'],
 	'username' => 'John M'
 ));
