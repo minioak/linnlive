@@ -3,11 +3,15 @@ LinnLive API for PHP
 
 A wrapper class for the LinnLive.com service.
 
-Get Stock
+Stock
 ---------
+### get
+#### Parameters
+	sku - Search by SKU
+	barcode - Search by barcode
+	stock_id - Search by internal LinnLive id
+	title - Search by product title
 
-Add Order
+
+Orders
 ---------
-
-Process Order
--------------
