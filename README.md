@@ -5,7 +5,7 @@ A wrapper class for the LinnLive.com service.
 
 Stock
 ---------
-### get
+### get($params = array())
 #### Parameters
 	sku - Search by SKU
 	barcode - Search by barcode

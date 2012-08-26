@@ -12,7 +12,7 @@
 
 require_once(dirname(__FILE__).'/linnlive.php');
 
-class Orders extends LinnLive_request
+class LinnLive_Orders extends LinnLive_request
 {
 	public function create($params = array())
     {

@@ -12,7 +12,7 @@
 
 require_once(dirname(__FILE__).'/linnlive.php');
 
-class Stock extends LinnLive_request
+class LinnLive_Stock extends LinnLive_request
 {
 	public function get($params = array())
     {
