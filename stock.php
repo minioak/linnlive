@@ -63,21 +63,77 @@ class LinnLive_stock extends LinnLive_request
 	    } 
 	    catch (Exception $e) 
 	    {
-		    return new LinnLive_response($e->getMessage(), LinnLive_response::FAILED);
+		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
 	    }
 	    
 	    return new LinnLive_response($response->GetStockItemResult->StockItems->StockItem);
     }
     
+    /**
+     * update function.
+     * 
+     * @access public
+     * @param array $params (default: array($params = array())
+     * @return LinnLive_response or array of LinnLive_response
+     */
     public function update($params = array())
     {
+	    $this->require_params(array('stock_id'), $params);
 	    
+	    $requests = array();
+	    $results = array();
+	    
+	    if (isset($params['price']))
+	    {
+		    $price_request = new UpdateStockItemListingPrice();
+		    $price_request->Delete = false;
+		    $price_request->pkStockItemid = $params['stock_id'];
+		    $price_request->channelPrice = new StockItemListingPrice();
+		    $price_request->channelPrice->SalePrice = $params['price'];
+		    
+		    $requests['UpdateStockItemListingPrice'] = array(
+		    	'type' => 'price',
+		    	'data' => $price_request,
+		    	'result' => 'UpdateStockItemListingPriceResult'
+		    );
+	    }
+	    
+	    if (isset($params['stock_level']))
+	    {
+		    $requests['ChangeStockLevel'] = array(
+		    	'type' => 'stock_level',
+		    	'data' => $this->_get_stock_level_request($params),
+		    	'result' => 'ChangeStockLevelResult'
+		    );
+	    }
+	    
+	    foreach ($requests as $method => $request)
+	    {
+		    try 
+		    {
+		    	$response = $this->call_service('InventoryClient', $method, $request['data']);
+		    
+			    $results[$request['type']] = new LinnLive_response($response->$request['result']);
+		    } 
+		    catch (Exception $e) 
+		    {
+			    $results[$request['type']] = new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
+		    }
+	    }
+	    
+	    if (sizeof($results) == 1)
+	    {
+	    	reset($results);
+	    	return $results[key($results)];
+	    }
+	    
+	    return $results;
     }
     
     
-    private function update_stock_level($params = array())
+    private function _get_stock_level_request($params = array())
     {
-    	$this->require_params(array('stock_id', 'location', 'level'), $params);
+    	$this->require_params(array('stock_id', 'location', 'stock_level'), $params);
     	
 	    $request = new ChangeStockLevel();
 	    $request->pkStockItemId = new guid($params['stock_id']);
@@ -85,20 +141,11 @@ class LinnLive_stock extends LinnLive_request
 	    
 	    $level = new StockItemLevel();
 	    $level->Location = $params['location'];
-	    $level->Level = $params['level'];
+	    $level->Level = $params['stock_level'];
 	    $level->IsSetLevel = true;
 	    
 	    $request->stocklevel = $level;
 	    
-	    try 
-	    {
-	    	$response = $this->call_service('InventoryClient', 'ChangeStockLevel', $request);
-	    } 
-	    catch (Exception $e) 
-	    {
-		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
-	    }
-    		
-    	return new LinnLive_response($response->ChangeStockLevelResult);
+	    return $request;
     }
 }
