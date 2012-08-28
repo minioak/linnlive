@@ -12,6 +12,7 @@
 
 require_once(dirname(__FILE__).'/libraries/linnlive/inventory.php');
 require_once(dirname(__FILE__).'/libraries/linnlive/order.php');
+require_once(dirname(__FILE__).'/libraries/linnlive/generic.php');
 
 class LinnLive_request
 {
@@ -33,6 +34,15 @@ class LinnLive_request
 		{
 			if (!isset($supplied[$param])) throw new Exception("Param $param was expected but not supplied.");
 		}
+	}
+	
+	protected function require_one_of($params = array(), $supplied)
+	{
+		foreach($params as $param)
+		{
+			if (isset($supplied[$param])) return;
+		}
+		throw new Exception("One of {print_r($params)} was expected but none were supplied.");
 	}
 	
 	protected function call_service($service, $method, $request)
@@ -108,6 +118,11 @@ class LinnLive_response
 	public function data()
 	{
 		return objectToArray($this->_response);
+	}
+	
+	public function rawdata()
+	{
+		return $this->_response;
 	}
 }
 

@@ -14,6 +14,9 @@ Stock
 		title => Search by product title
 	);
 
+### update_stock_level($params = array())
+
+### update_stock_item($params = array())
 
 Orders
 ---------

@@ -27,12 +27,6 @@ class GetStockItemResponse {
   public $StockItems; // ArrayOfStockItem
 }
 
-class GenericResponse {
-  public $Error; // string
-  public $ErrorNum; // int
-  public $IsError; // boolean
-}
-
 class StockItem {
   public $pkStockItemId; // guid
   public $ItemTitle; // string
@@ -77,39 +71,6 @@ class StockItem {
   public $MappedChannelSKUs; // ArrayOfStockItemMapping
 }
 
-class StockItemSupplier {
-  public $fkStockItemId; // guid
-  public $fkSupplierId; // guid
-  public $IsDefault; // boolean
-  public $SupplierName; // string
-  public $SupplierCode; // string
-  public $IsSetSupplierCode; // boolean
-  public $SupplierCode2; // string
-  public $IsSetSupplierCode2; // boolean
-  public $SupplierBarcode; // string
-  public $IsSetSupplierBarcode; // boolean
-  public $LeadTime; // int
-  public $IsSetLeadTime; // boolean
-  public $KnownPurchasePrice; // double
-  public $IsSetKnownPurchasePrice; // boolean
-  public $AvgPurchasePrice; // double
-  public $IsSetAvgPurchasePrice; // boolean
-  public $AvgLeadTime; // double
-  public $IsSetAvgLeadTime; // boolean
-  public $MaxLeadTime; // double
-  public $IsSetMaxLeadTime; // boolean
-  public $MinOrder; // double
-  public $IsSetMinOrder; // boolean
-  public $OnHand; // double
-  public $IsSetOnHand; // boolean
-  public $MinPurchasePrice; // double
-  public $IsSetMinPurchasePrice; // boolean
-  public $MaxPurchasePrice; // double
-  public $IsSetMaxPurchasePrice; // boolean
-  public $AvgPurchaseQty; // double
-  public $IsSetAvgPurchaseQty; // boolean
-}
-
 class StockItemExtendedProperty {
   public $PropertyName; // string
   public $PropertyValue; // string
@@ -143,12 +104,6 @@ class StockItemListingDescription {
 
 class StockItemListingTitle {
   public $Title; // string
-}
-
-class StockItemLocation {
-  public $LocationID; // guid
-  public $LocationName; // string
-  public $BinRack; // string
 }
 
 class StockItemImage {
