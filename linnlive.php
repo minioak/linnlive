@@ -35,6 +35,15 @@ class LinnLive_request
 		}
 	}
 	
+	protected function require_one_of($params = array(), $supplied)
+	{
+		foreach($params as $param)
+		{
+			if (isset($supplied[$param])) return;
+		}
+		throw new Exception("One of {print_r($params)} was expected but none were supplied.");
+	}
+	
 	protected function call_service($service, $method, $request)
 	{
 		$client = new $service();
@@ -108,6 +117,11 @@ class LinnLive_response
 	public function data()
 	{
 		return objectToArray($this->_response);
+	}
+	
+	public function rawdata()
+	{
+		return $this->_response;
 	}
 }
 

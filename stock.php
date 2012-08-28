@@ -70,82 +70,84 @@ class LinnLive_stock extends LinnLive_request
     }
     
     /**
-     * update function.
+     * update_stock_item function.
      * 
      * @access public
      * @param array $params (default: array($params = array())
      * @return LinnLive_response or array of LinnLive_response
      */
-    public function update($params = array())
+    public function update_stock_item($params = array())
     {
-	    $this->require_params(array('stock_id'), $params);
+    	$property_map = array(
+    		'price' => 'RetailPrice',
+    		'title' => 'ItemTitle'
+    	);
+    	
+	    $this->require_one_of(array('stock_id', 'sku', 'barcode'), $params);
+	    $this->require_params(array('item'), $params);
 	    
-	    $requests = array();
-	    $results = array();
+	    $request = new SaveStockItem();
 	    
-	    if (isset($params['price']))
+	    $stock_item = $this->get(array(
+	    	'filter' => $params
+	    ));
+	    
+	    $request->item = $stock_item->rawdata();
+	   	    
+	    if ($request->item)
 	    {
-		    $price_request = new UpdateStockItemListingPrice();
-		    $price_request->Delete = false;
-		    $price_request->pkStockItemid = $params['stock_id'];
-		    $price_request->channelPrice = new StockItemListingPrice();
-		    $price_request->channelPrice->SalePrice = $params['price'];
-		    
-		    $requests['UpdateStockItemListingPrice'] = array(
-		    	'type' => 'price',
-		    	'data' => $price_request,
-		    	'result' => 'UpdateStockItemListingPriceResult'
-		    );
-	    }
-	    
-	    if (isset($params['stock_level']))
-	    {
-		    $requests['ChangeStockLevel'] = array(
-		    	'type' => 'stock_level',
-		    	'data' => $this->_get_stock_level_request($params),
-		    	'result' => 'ChangeStockLevelResult'
-		    );
-	    }
-	    
-	    foreach ($requests as $method => $request)
-	    {
+	    	foreach ($params['item'] as $property => $value)
+	    	{
+		    	if (in_array($property, array_keys($property_map)))
+		    	{
+		    		$isset = 'IsSet'.$property_map[$property];
+		    		$obj_property = $property_map[$property];
+			    	$request->item->$obj_property = $value;
+			    	$request->item->$isset = true;
+		    	}
+		    	else
+		    	{
+			    	throw new Exception("Unsupported property $property was passed");
+		    	}
+	    	}
+	    	
 		    try 
 		    {
-		    	$response = $this->call_service('InventoryClient', $method, $request['data']);
+		    	$response = $this->call_service('InventoryClient', 'SaveStockItem', $request);
 		    
-			    $results[$request['type']] = new LinnLive_response($response->$request['result']);
+			    return new LinnLive_response($response->SaveStockItemResult);
 		    } 
 		    catch (Exception $e) 
 		    {
-			    $results[$request['type']] = new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
+			    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
 		    }
 	    }
-	    
-	    if (sizeof($results) == 1)
-	    {
-	    	reset($results);
-	    	return $results[key($results)];
-	    }
-	    
-	    return $results;
     }
     
-    
-    private function _get_stock_level_request($params = array())
+    public function update_stock_level($params = array())
     {
-    	$this->require_params(array('stock_id', 'location', 'stock_level'), $params);
+    	$this->require_params(array('stock_id', 'location', 'level'), $params);
     	
 	    $request = new ChangeStockLevel();
 	    $request->pkStockItemId = new guid($params['stock_id']);
 	    $request->UpdateSource = 'API';
-	    
+
 	    $level = new StockItemLevel();
 	    $level->Location = $params['location'];
-	    $level->Level = $params['stock_level'];
+	    $level->Level = $params['level'];
 	    $level->IsSetLevel = true;
-	    
+
 	    $request->stocklevel = $level;
-	    
-	    return $request;
+
+	    try 
+	    {
+	    	$response = $this->call_service('InventoryClient', 'ChangeStockLevel', $request);
+	    } 
+	    catch (Exception $e) 
+	    {
+		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
+	    }
+    		
+    	return new LinnLive_response($response->ChangeStockLevelResult);
     }
 }
