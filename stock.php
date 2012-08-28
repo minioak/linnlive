@@ -126,7 +126,7 @@ class LinnLive_stock extends LinnLive_request
     
     public function update_stock_level($params = array())
     {
-    	$this->require_params(array('stock_id', 'location', 'level'), $params);
+    	$this->require_params(array('stock_id', 'location', 'stock_level'), $params);
     	
 	    $request = new ChangeStockLevel();
 	    $request->pkStockItemId = new guid($params['stock_id']);
@@ -134,7 +134,7 @@ class LinnLive_stock extends LinnLive_request
 
 	    $level = new StockItemLevel();
 	    $level->Location = $params['location'];
-	    $level->Level = $params['level'];
+	    $level->Level = $params['stock_level'];
 	    $level->IsSetLevel = true;
 
 	    $request->stocklevel = $level;

@@ -12,6 +12,7 @@
 
 require_once(dirname(__FILE__).'/libraries/linnlive/inventory.php');
 require_once(dirname(__FILE__).'/libraries/linnlive/order.php');
+require_once(dirname(__FILE__).'/libraries/linnlive/generic.php');
 
 class LinnLive_request
 {
