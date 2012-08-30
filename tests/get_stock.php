@@ -4,6 +4,16 @@ require_once(dirname(__FILE__).'/../stock.php');
 
 $linn = new LinnLive_stock();
 $linn->initialize(array('api_key' => ''));
-$stock = $linn->get();
+$page = 1;
+echo "Getting page $page\r\n";
+$stock = $linn->get(array(
+	'page' => $page++
+));
 
-var_dump($stock->data());
+while (sizeof($stock->data()))
+{
+	echo "Getting page $page\r\n";
+	$stock = $linn->get(array(
+		'page' => $page++
+	));
+}
