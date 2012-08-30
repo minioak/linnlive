@@ -57,16 +57,30 @@ class LinnLive_stock extends LinnLive_request
 			}
 		}
 		
+		$request->filter->EntriesPerPage = 100;
+		$request->filter->PageNumber = 1;
+		
+		$items = array();
+		
 	    try 
 	    {
 	    	$response = $this->call_service('InventoryClient', 'GetStockItem', $request);
+	    	array_push($items, $response->GetStockItemResult->StockItems->StockItem);
+	    	
+	    	while ($response->GetStockItemResult->MorePages)
+	    	{
+	    		$request->filter->PageNumber++;
+		    	$response = $this->call_service('InventoryClient', 'GetStockItem', $request);
+		    	
+		    	array_push($items, $response->GetStockItemResult->StockItems->StockItem);
+	    	}
 	    } 
 	    catch (Exception $e) 
 	    {
 		    return new LinnLive_response(false, $e->getMessage(), LinnLive_response::FAILED);
 	    }
 	    
-	    return new LinnLive_response($response->GetStockItemResult->StockItems->StockItem);
+	    return new LinnLive_response($items);
     }
     
     /**
